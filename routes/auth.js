@@ -7,10 +7,11 @@ router.get('/', (req, res) => {
 });
 
 //register
-router.get('/register', async (req, res) => {
+router.post('/register', async (req, res) => {
     try {
         //encode password
         const salt = await bcrypt.genSalt(10);
+        console.log(req.body);
         const hashedPassword = await bcrypt.hash(req.body.password, salt);
         //new user doc
         const newUser = await new User({
@@ -36,6 +37,7 @@ router.post('/login', async (req, res) => {
             req.body.password,
             user.password
         );
+
         !isValidPassword && res.status(400).json('wrong password ');
 
         res.status(200).json(user);

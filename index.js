@@ -6,6 +6,7 @@ const groupRoutes = require('./routes/group');
 const messageRoutes = require('./routes/message');
 const userRoute = require('./routes/user');
 const authRoute = require('./routes/auth');
+const cors = require('cors');
 
 //setup
 dotenv.config();
@@ -14,6 +15,7 @@ const dbConnectionString = process.env.MONGO_URL;
 const PORT = process.env.PORT || 3000;
 
 //middleware
+app.use(cors({ origin: 'http://localhost:3000' }));
 app.use(express.json());
 
 app.use('/api/user', userRoute);

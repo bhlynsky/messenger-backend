@@ -20,6 +20,8 @@ app.use(express.json());
 
 app.use('/api/user', userRoute);
 app.use('/api/auth', authRoute);
+app.use('/api/group', groupRoutes);
+app.use('/api/message', messageRoutes);
 
 async function start() {
     try {

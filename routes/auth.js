@@ -11,7 +11,7 @@ router.post('/register', async (req, res) => {
     try {
         //encode password
         const salt = await bcrypt.genSalt(10);
-        console.log(req.body);
+
         const hashedPassword = await bcrypt.hash(req.body.password, salt);
         //new user doc
         const newUser = await new User({
@@ -32,7 +32,7 @@ router.post('/login', async (req, res) => {
     try {
         const user = await User.findOne({ email: req.body.email });
         !user && res.status(404).json('user not found');
-
+        console.log(req.body);
         const isValidPassword = await bcrypt.compare(
             req.body.password,
             user.password

@@ -32,16 +32,20 @@ router.get('/user/:userId', async (req, res) => {
             members: { $in: req.params.userId },
         });
 
-        let messagesFromAllGroups = await Promise.all(
-            groups.map(async (group) => {
-                return await Message.find({
-                    groupId: group.id,
-                });
-            })
-        );
+        let messagesFromAllGroups = [];
+
+        for (const group of groups) {
+            const groupMessages = await Message.find({
+                groupId: group.id,
+            });
+            messagesFromAllGroups.push({
+                groupId: group.id,
+                groupMessages,
+            });
+        }
 
         res.status(200).json(messagesFromAllGroups);
-    } catch (error) {
+    } catch (err) {
         res.status(500).json(err);
     }
 });

@@ -4,22 +4,23 @@ const Group = require('../models/Group');
 
 router.post('/new', async (req, res) => {
     const newMessage = new Message(req.body);
-
+    const group = await Group.findOne({ id: req.body.groupId });
+    group.lastMessage = newMessage.id;
     try {
         const savedMessage = await newMessage.save();
+        await group.save();
         res.status(200).json(savedMessage);
     } catch (err) {
         res.status(500).json(err);
     }
 });
 
-//get messages for group(probably useless)
-router.get('/:groupId', async (req, res) => {
+//get single message
+router.get('/:messageId', async (req, res) => {
     try {
-        const messages = await Message.find({
-            groupId: req.params.groupId,
-        });
-        res.status(200).json(messages);
+        const message = await Message.findById(req.params.messageId);
+
+        res.status(200).json(message);
     } catch (err) {
         res.status(500).json(err);
     }
@@ -37,7 +38,8 @@ router.get('/user/:userId', async (req, res) => {
         for (const group of groups) {
             const groupMessages = await Message.find({
                 groupId: group.id,
-            });
+            }).sort({ createdAt: 'asc' });
+
             messagesFromAllGroups.push({
                 groupId: group.id,
                 groupMessages,

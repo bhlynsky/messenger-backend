@@ -23,7 +23,23 @@ router.post('/register', async (req, res) => {
         const user = await newUser.save();
         res.status(200).json(user);
     } catch (err) {
-        res.status(500).json(err);
+        if (err.code === 11000) {
+            if (err.keyValue.username) {
+                res.status(400).json({
+                    ...err,
+                    message: 'User with this name already exists',
+                });
+            }
+
+            if (err.keyValue.email) {
+                res.status(400).json({
+                    ...err,
+                    message: 'User with this email already exists',
+                });
+            }
+        } else {
+            res.status(500).json(err);
+        }
         console.log(err);
     }
 });
@@ -31,14 +47,19 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
     try {
         const user = await User.findOne({ email: req.body.email });
-        !user && res.status(404).json('user not found');
-        console.log('User logged : ' + req.body.email);
+        !user &&
+            res
+                .status(404)
+                .json({ message: 'User not found. Check your email.' });
+
         const isValidPassword = await bcrypt.compare(
             req.body.password,
             user.password
         );
 
-        !isValidPassword && res.status(400).json('wrong password ');
+        !isValidPassword &&
+            res.status(400).json({ message: 'Wrong password. ' });
+        console.log('User logged : ' + req.body.email);
 
         res.status(200).json(user);
     } catch (err) {

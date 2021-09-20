@@ -7,6 +7,10 @@ const messageRoutes = require('./routes/message');
 const userRoute = require('./routes/user');
 const authRoute = require('./routes/auth');
 const cors = require('cors');
+const server = require('http').createServer(app);
+const WebSocket = require('ws');
+const webSocketServer = new WebSocket.Server({ server });
+const messageController = require('./messageController');
 
 //setup
 dotenv.config();
@@ -23,6 +27,18 @@ app.use('/api/auth', authRoute);
 app.use('/api/group', groupRoutes);
 app.use('/api/message', messageRoutes);
 
+/// websocket "router"
+
+webSocketServer.on('connection', (ws) => {
+    ws.on('message', (message) =>
+        messageController(message, webSocketServer, ws)
+    );
+    ws.on('error', (err) => ws.send(err));
+
+    ws.send('Hi there, I am a WebSocket server');
+    console.log('Client connected.');
+});
+
 async function start() {
     try {
         await mongoose.connect(
@@ -35,10 +51,13 @@ async function start() {
             }
         );
         app.listen(PORT, () => {
-            console.log('server Started ');
+            console.log('http server Started ');
         });
+
+        server.listen(9000, () => console.log('Web socket server started'));
     } catch (e) {
         console.log(e);
     }
 }
+
 start();

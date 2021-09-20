@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const Group = require('../models/Group');
-const Message = require('../models/Message');
+
 //new group
 router.post('/new', async (req, res) => {
     const newGroup = new Group({
@@ -29,11 +29,5 @@ router.get('/:userId', async (req, res) => {
         res.status(500).json(err);
     }
 });
-
-/*router.put('/group/update/:groupId',async(req,res)=>{
-    try{
-        const group = await Group.find({_id:})
-    }
-})*/
 
 module.exports = router;

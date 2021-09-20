@@ -2,24 +2,12 @@ const router = require('express').Router();
 const Message = require('../models/Message');
 const Group = require('../models/Group');
 
-router.post('/new', async (req, res) => {
-    const newMessage = new Message(req.body);
-    const group = await Group.findOne({ id: req.body.groupId });
-    group.lastMessage = newMessage.id;
-    try {
-        const savedMessage = await newMessage.save();
-        await group.save();
-        res.status(200).json(savedMessage);
-    } catch (err) {
-        res.status(500).json(err);
-    }
-});
-
 //get single message
 router.get('/:messageId', async (req, res) => {
     try {
         const message = await Message.findById(req.params.messageId);
-
+        !message &&
+            res.status(404).json({ message: 'This message does not exist' });
         res.status(200).json(message);
     } catch (err) {
         res.status(500).json(err);

@@ -8,12 +8,11 @@ const messageController = async (data, socket, ws) => {
         case 'chat-message': {
             try {
                 const newMessage = new Message(json.message);
-
-                const group = await Group.findOne({ _id: newMessage.groupId });
-                group.lastMessage = newMessage.id;
-                await group.save();
-
                 const savedMessage = await newMessage.save();
+
+                const group = await Group.findById(newMessage.groupId);
+                group.lastMessage = savedMessage.id;
+                await group.save();
 
                 const response = JSON.stringify(savedMessage);
                 socket.clients.forEach((client) => client.send(response));

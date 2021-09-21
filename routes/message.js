@@ -18,7 +18,7 @@ router.get('/:messageId', async (req, res) => {
 router.get('/user/:userId', async (req, res) => {
     try {
         const groups = await Group.find({
-            members: { $in: req.params.userId },
+            members: { $elemMatch: { userId: req.params.userId } },
         });
 
         let messagesFromAllGroups = [];

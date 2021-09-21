@@ -28,7 +28,6 @@ app.use('/api/group', groupRoutes);
 app.use('/api/message', messageRoutes);
 
 /// websocket "router"
-
 webSocketServer.on('connection', (ws) => {
     ws.on('message', (message) =>
         messageController(message, webSocketServer, ws)

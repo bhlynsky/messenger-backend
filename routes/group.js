@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const Group = require('../models/Group');
+const User = require('../models/User');
 
 //new group
 router.post('/new', async (req, res) => {
@@ -21,7 +22,7 @@ router.post('/new', async (req, res) => {
 router.get('/:userId', async (req, res) => {
     try {
         const groups = await Group.find({
-            members: { $in: [req.params.userId] },
+            members: { $elemMatch: { userId: req.params.userId } },
         });
 
         res.status(200).json(groups);

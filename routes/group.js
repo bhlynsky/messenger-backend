@@ -39,20 +39,19 @@ router.put('/addusers/:groupId', async (req, res) => {
         const newUsers = req.body;
 
         let group = await Group.findById(groupId);
-        group.members = group.members.concat(newUsers);
-
-        console.log(group.members);
 
         !group && res.status(404).json({ message: 'Group no found' });
 
-        const updatedGroup = await Group.findOneAndUpdate(
-            { id: groupId },
-            group
+        group.members = group.members.concat(newUsers);
+
+        const updatedGroup = await Group.updateOne(
+            { _id: groupId },
+            { members: group.members }
         );
 
         !updatedGroup && res.status(400).json({ message: "Can't save group" });
-
-        res.status(200).json(updatedGroup);
+        // return members to update client state
+        res.status(200).json(group.members);
     } catch (err) {
         res.status(500).json({ message: `Error ${err}` });
     }

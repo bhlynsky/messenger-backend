@@ -10,14 +10,16 @@ router.get('/', (req, res) => {
 router.post('/register', async (req, res) => {
     try {
         //check if emails is taken
-        const email = await User.find({ email: req.body.email });
-        email &&
+        const email = await User.findOne({ email: req.body.email });
+
+        if (email) {
             res.status(400).json({
                 message: 'User with this email already exists',
             });
+        }
 
         //check if username is taken
-        const username = await User.find({ username: req.body.username });
+        const username = await User.findOne({ username: req.body.username });
         username &&
             res.status(400).json({
                 message: 'User with this name already exists',
@@ -65,7 +67,5 @@ router.post('/login', async (req, res) => {
         console.log(err);
     }
 });
-
-
 
 module.exports = router;

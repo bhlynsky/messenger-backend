@@ -57,4 +57,32 @@ router.put('/addusers/:groupId', async (req, res) => {
     }
 });
 
+router.put('/removeUser', async (req, res) => {
+    const userId = req.body.userId;
+    const groupId = req.body.groupId;
+
+    try {
+        const group = await Group.findById(groupId);
+
+        !group && res.status(404).json({ message: 'Group not found' });
+
+        const newMembers = group.members.filter((user) => {
+            if (userId !== user.userId) {
+                return user;
+            }
+        });
+
+        const updatedGroup = await Group.updateOne(
+            { _id: groupId },
+            { members: newMembers }
+        );
+
+        !updatedGroup && res.status(500).json({ message: "Can't save group" });
+
+        res.status(200).json(newMembers);
+    } catch (err) {
+        res.status(500).json({ message: `Error ${err}` });
+    }
+});
+
 module.exports = router;

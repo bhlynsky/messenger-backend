@@ -7,7 +7,7 @@ router.get('/', (req, res) => {
 
 router.get('/userlist/', async (req, res) => {
     try {
-        const users = await User.find().limit(15);
+        const users = await User.find();
 
         !users && res.status(404).json({ message: 'No users found' });
 

@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
+const errors = require('../services/constants');
 
 router.get('/', (req, res) => {
     res.send('auth router');
@@ -14,17 +15,17 @@ router.post('/register', async (req, res) => {
 
         if (email) {
             res.status(400).json({
-                message: 'User with this email already exists',
+                message: errors.EMAIL_ALREADY_IN_USE,
             });
         }
 
         //check if username is taken
         const username = await User.findOne({ username: req.body.username });
-        username &&
+        if (username) {
             res.status(400).json({
-                message: 'User with this name already exists',
+                message: errors.NAME_ALREADY_IN_USE,
             });
-
+        }
         //encode password
         const salt = await bcrypt.genSalt(10);
 
@@ -48,10 +49,7 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
     try {
         const user = await User.findOne({ email: req.body.email });
-        !user &&
-            res
-                .status(404)
-                .json({ message: 'User not found. Check your email.' });
+        !user && res.status(404).json({ message: errors.USER_NOT_FOUND });
 
         const isValidPassword = await bcrypt.compare(
             req.body.password,
@@ -59,7 +57,7 @@ router.post('/login', async (req, res) => {
         );
 
         !isValidPassword &&
-            res.status(400).json({ message: 'Wrong password. ' });
+            res.status(400).json({ message: errors.WRONG_PASSWORD });
         console.log('User logged : ' + req.body.email);
 
         res.status(200).json(user);

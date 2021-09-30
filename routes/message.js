@@ -1,13 +1,16 @@
 const router = require('express').Router();
 const Message = require('../models/Message');
 const Group = require('../models/Group');
+const errors = require('../services/constants');
 
 //get single message
 router.get('/:messageId', async (req, res) => {
     try {
         const message = await Message.findById(req.params.messageId);
+
         !message &&
-            res.status(404).json({ message: 'This message does not exist' });
+            res.status(404).json({ message: errors.MESSAGE_DONT_EXIST });
+
         res.status(200).json(message);
     } catch (err) {
         res.status(500).json(err);

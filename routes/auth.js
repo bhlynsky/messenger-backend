@@ -1,6 +1,7 @@
 const router = require('express').Router();
-const User = require('../models/user');
+const User = require('../models/User');
 const bcrypt = require('bcrypt');
+const errors = require('../services/constants');
 
 router.get('/', (req, res) => {
     res.send('auth router');
@@ -9,9 +10,25 @@ router.get('/', (req, res) => {
 //register
 router.post('/register', async (req, res) => {
     try {
+        //check if emails is taken
+        const email = await User.findOne({ email: req.body.email });
+
+        if (email) {
+            res.status(400).json({
+                message: errors.EMAIL_ALREADY_IN_USE,
+            });
+        }
+
+        //check if username is taken
+        const username = await User.findOne({ username: req.body.username });
+        if (username) {
+            res.status(400).json({
+                message: errors.NAME_ALREADY_IN_USE,
+            });
+        }
         //encode password
         const salt = await bcrypt.genSalt(10);
-        console.log(req.body);
+
         const hashedPassword = await bcrypt.hash(req.body.password, salt);
         //new user doc
         const newUser = await new User({
@@ -24,21 +41,24 @@ router.post('/register', async (req, res) => {
         res.status(200).json(user);
     } catch (err) {
         res.status(500).json(err);
-        console.log(err);
     }
 });
+
 //login
+
 router.post('/login', async (req, res) => {
     try {
         const user = await User.findOne({ email: req.body.email });
-        !user && res.status(404).json('user not found');
+        !user && res.status(404).json({ message: errors.USER_NOT_FOUND });
 
         const isValidPassword = await bcrypt.compare(
             req.body.password,
             user.password
         );
 
-        !isValidPassword && res.status(400).json('wrong password ');
+        !isValidPassword &&
+            res.status(400).json({ message: errors.WRONG_PASSWORD });
+        console.log('User logged : ' + req.body.email);
 
         res.status(200).json(user);
     } catch (err) {

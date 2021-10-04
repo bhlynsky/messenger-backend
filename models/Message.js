@@ -5,7 +5,10 @@ const MessageSchema = new mongoose.Schema(
         groupId: {
             type: String,
         },
-        sender: {
+        senderId: {
+            type: String,
+        },
+        senderName: {
             type: String,
         },
         content: {

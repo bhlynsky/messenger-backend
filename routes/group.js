@@ -40,7 +40,9 @@ router.put('/addusers/:groupId', async (req, res) => {
 
         let group = await Group.findById(groupId);
 
-        !group && res.status(404).json({ message: errors.GROUP_NOT_FOUND });
+        if (!group) {
+            res.status(404).json({ message: errors.GROUP_NOT_FOUND });
+        }
 
         group.members = group.members.concat(newUsers);
 
@@ -49,8 +51,10 @@ router.put('/addusers/:groupId', async (req, res) => {
             { members: group.members }
         );
 
-        !updatedGroup &&
+        if (!updatedGroup) {
             res.status(400).json({ message: errors.GROUP_SAVE_ERROR });
+        }
+
         // return members to update client state
         res.status(200).json(group.members);
     } catch (err) {
@@ -65,7 +69,9 @@ router.put('/removeUser', async (req, res) => {
     try {
         const group = await Group.findById(groupId);
 
-        !group && res.status(404).json({ message: errors.GROUP_NOT_FOUND });
+        if (group) {
+            res.status(404).json({ message: errors.GROUP_NOT_FOUND });
+        }
 
         const newMembers = group.members.filter((user) => {
             if (userId !== user.userId) {
@@ -78,9 +84,9 @@ router.put('/removeUser', async (req, res) => {
             { members: newMembers }
         );
 
-        !updatedGroup &&
+        if (updatedGroup) {
             res.status(500).json({ message: errors.GROUP_SAVE_ERROR });
-
+        }
         res.status(200).json(newMembers);
     } catch (err) {
         res.status(500).json({ message: `Error ${err}` });

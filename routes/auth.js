@@ -21,6 +21,7 @@ router.post('/register', async (req, res) => {
 
         //check if username is taken
         const username = await User.findOne({ username: req.body.username });
+
         if (username) {
             res.status(400).json({
                 message: errors.NAME_ALREADY_IN_USE,
@@ -56,8 +57,10 @@ router.post('/login', async (req, res) => {
             user.password
         );
 
-        !isValidPassword &&
+        if (!isValidPassword) {
             res.status(400).json({ message: errors.WRONG_PASSWORD });
+        }
+
         console.log('User logged : ' + req.body.email);
 
         res.status(200).json(user);

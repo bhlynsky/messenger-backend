@@ -8,7 +8,7 @@ router.get('/:messageId', async (req, res) => {
     try {
         const message = await Message.findById(req.params.messageId);
 
-        !message &&
+        if (!message)
             res.status(404).json({ message: errors.MESSAGE_DONT_EXIST });
 
         res.status(200).json(message);
@@ -42,4 +42,5 @@ router.get('/user/:userId', async (req, res) => {
         res.status(500).json(err);
     }
 });
+
 module.exports = router;

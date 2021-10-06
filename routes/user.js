@@ -8,7 +8,9 @@ router.get('/userlist/', async (req, res) => {
     try {
         const users = await User.find();
 
-        !users && res.status(404).json({ message: errors.USERS_NOT_FOUND });
+        if (!users) {
+            res.status(404).json({ message: errors.USERS_NOT_FOUND });
+        }
 
         const userDTO = users.map((user) => {
             return { userId: user.id, username: user.username };
@@ -23,11 +25,14 @@ router.get('/userlist/', async (req, res) => {
 router.get('/userlist/:searchQuery', async (req, res) => {
     try {
         const searchQuery = req.params.searchQuery;
+
         const users = await User.find({
             username: { $regex: `${searchQuery}`, $options: 'i' },
         }).limit(15);
 
-        !users && res.status(404).json({ message: errors.USERS_NOT_FOUND });
+        if (!users) {
+            res.status(404).json({ message: errors.USERS_NOT_FOUND });
+        }
 
         const userDTO = users.map((user) => {
             return { userId: user.id, username: user.username };
